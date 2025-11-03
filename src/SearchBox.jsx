@@ -3,22 +3,30 @@ import Button from '@mui/material/Button';
 import "./SearchBox.css";
 import { useState } from 'react';
 
+
 export default function SearchBox({updateInfo}) {
 
     let [city, setCity] = useState("");
     let [error, setError] = useState(false);
 
 
-    const API_URL = "https://api.openweathermap.org/data/2.5/weather";
-    const API_KEY = "28ae8bb64f23fe6e71505f0b5bb67009";
+    const API_URL = import.meta.env.VITE_WEATHER_APP_API_URL || import.meta.env.WEATHER_APP_API_URL;
+    const API_KEY = import.meta.env.VITE_WEATHER_APP_API_KEY || import.meta.env.WEATHER_APP_API_KEY;
 
-    let getWeatherInfo = async () => {
+    let getWeatherInfo = async (query) => {
         try {
-            let response = await fetch(`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`);
-            let jsonResponse = await response.json();
+            if (!API_URL || !API_KEY) {
+                throw new Error("API_URL or API_KEY not configured. Ensure env vars are set (VITE_WEATHER_APP_API_URL / VITE_WEATHER_APP_API_KEY).");
+            }
+            const response = await fetch(`${API_URL}?q=${encodeURIComponent(query)}&appid=${API_KEY}&units=metric`);
+            const jsonResponse = await response.json();
+            if (!response.ok) {
+                // API returns an error message in the body (e.g., { message: "city not found" })
+                throw new Error(jsonResponse.message || "Failed to fetch weather data");
+            }
             console.log(jsonResponse);
             let result = {
-                city: city,
+                city: query,
                 temp: jsonResponse.main.temp,
                 tempMin: jsonResponse.main.temp_min,
                 tempMax: jsonResponse.main.temp_max,
@@ -39,13 +47,17 @@ export default function SearchBox({updateInfo}) {
     }
 
     let handleSubmit = async (event) => {
+        event.preventDefault();
+        const query = city.trim();
+        if (!query) return;
         try {
-            event.preventDefault();
-            console.log("City name submitted: ", city);
+            console.log("City name submitted: ", query);
             setCity("");
-            let newInfo = await getWeatherInfo();
+            setError(false);
+            let newInfo = await getWeatherInfo(query);
             updateInfo(newInfo);
         } catch (err) {
+            console.error(err);
             setError(true);
         }
         
