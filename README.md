@@ -48,8 +48,8 @@ Before running this application, make sure you have the following installed:
    
    Create a `.env` file in the root directory and add your OpenWeatherMap API key:
    ```
-   REACT_APP_API_KEY=your_api_key_here
-   REACT_APP_API_URL=https://api.openweathermap.org/data/2.5
+   VITE_WEATHER_APP_API_KEY=your_api_key_here
+   VITE_WEATHER_APP_API_URL=https://api.openweathermap.org/data/2.5
    ```
 
    To get your API key:
@@ -90,7 +90,7 @@ react-weather-app/
 │   ├── App.jsx
 │   ├── index.css
 │   ├── InfoBox.css
-│   ├── InfoBoz.jsx
+│   ├── InfoBox.jsx
 │   ├── main.jsx
 │   ├── SearchBox.css
 │   ├── SearchBox.jsx
